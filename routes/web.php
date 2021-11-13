@@ -17,13 +17,14 @@ Route::get('/', function () {
     return view('welcome');
 });
 
+Route::get('/', 'PageController@index');
+
 //Rotte autent
 Auth::routes();
 
 
 //Rotte Admin
-Route::middleware('auth')->namespace('Admin')->name('admin.')->prefix('admin')->group(
-    function () {
+Route::middleware('auth')->namespace('Admin')->name('admin.')->prefix('admin')->group(function(){
+
         Route::get('/home', 'HomeController@index')->name('home');
-    }
-);
+});

@@ -12,11 +12,18 @@ use Illuminate\Support\Facades\Route;
 | contains the "web" middleware group. Now create something great!
 |
 */
-
+//rotte pubbliche
 Route::get('/', function () {
     return view('welcome');
 });
 
+//Rotte autent
 Auth::routes();
 
-Route::get('/home', 'HomeController@index')->name('home');
+
+//Rotte Admin
+Route::middleware('auth')->namespace('Admin')->name('admin.')->prefix('admin')->group(
+    function () {
+        Route::get('/home', 'HomeController@index')->name('home');
+    }
+);

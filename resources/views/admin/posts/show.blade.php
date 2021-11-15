@@ -8,14 +8,8 @@
                 <div class="card-header">{{ __('Dashboard') }}</div>
 
                 <div class="card-body">
-                    @if (session('status'))
-                        <div class="alert alert-success" role="alert">
-                            {{ session('status') }}
-                        </div>
-                    @endif
-                    <a href="{{route('admin.posts.index')}}">Visualizza tutti i post</a>
-
-                    
+                 <h1>{{$post['title']}}</h1>
+                 <p>{{$post['content']}}</p>
                 </div>
             </div>
         </div>

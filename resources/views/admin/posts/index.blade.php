@@ -3,7 +3,7 @@
 @section('content')
 <div class="container">
     <div class="row justify-content-center">
-        <div class="col-md-8">
+        <div class="col-md-12">
             <div class="card">
                 <div class="card-header">{{ __('Dashboard') }}</div>
 
@@ -15,7 +15,7 @@
                             <th scope="col">Title</th>
                             <th scope="col">Slug</th>
                             <th scope="col">Content</th>
-                            <th scope="col">Action Ciao</th>
+                            <th scope="col">Action</th>
                           </tr>
                         </thead>
                         <tbody>
@@ -26,7 +26,7 @@
                                 <td>{{$post['slug']}}</td>
                                 <td>{{$post['content']}}</td>
                                 <td>
-                                    <a href="">
+                                    <a href="{{route('admin.posts.show', $post['id'])}}">
                                         <button type="button" class="btn btn-primary">Visualizza</button>
                                     </a>
                                 </td>

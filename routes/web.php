@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Admin\PostController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -18,6 +19,7 @@ Route::get('/', function () {
 });
 
 Route::get('/', 'PageController@index');
+Route::get('/blog', 'PostController@index');
 
 //Rotte autent
 Auth::routes();

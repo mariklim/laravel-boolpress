@@ -20,6 +20,7 @@ Route::get('/', function () {
 
 Route::get('/', 'PageController@index');
 Route::get('/blog', 'PostController@index');
+Route::get('/blog/{slug}', 'PostController@show')->name("posts.show");
 
 //Rotte autent
 Auth::routes();

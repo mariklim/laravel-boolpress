@@ -43,18 +43,17 @@ class PostController extends Controller
      */
     public function store(Request $request)
     {
-        //validations
-        $request->validate($this->validationRules);
+         //validations
+         $request->validate($this->validationRules);
 
-        $newPost = new Post();
-        $newPost->fill($request->all());
-       
-        $slug = Str::of($request->title)->slug('-');
-        $newPost->slug = $slug;
-
-        $newPost->save();
-
-        return redirect()->route("admin.posts.index")->with('success',"Il post è stato creato");
+         $newPost = new Post();
+         $newPost->fill($request->all());
+        
+         $newPost->slug = $this->getSlug($request->title);
+ 
+         $newPost->save();
+ 
+         return redirect()->route("admin.posts.index")->with('success',"Il post è stato creato");   
     }
 
     /**
@@ -101,5 +100,28 @@ class PostController extends Controller
     {
        $post->delete();
        return redirect()->route('admin.posts.index')->with('success','il post è stato eliminato');
+    }
+
+     /**
+     * getSlug - return a unique slug
+     *
+     * @param  string $title
+     * @return string
+     */
+    private function getSlug($title)
+    {
+        $slug = Str::of($title)->slug('-');
+
+        $postExist = Post::where("slug", $slug)->first();
+
+        $count = 2;
+        
+        while($postExist) {
+            $slug = Str::of($title)->slug('-') . "-{$count}";
+            $postExist = Post::where("slug", $slug)->first();
+            $count++;
+        }
+
+        return $slug;
     }
 }

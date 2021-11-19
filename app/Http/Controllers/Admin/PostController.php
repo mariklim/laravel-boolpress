@@ -4,16 +4,21 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
-use App\Post;
-use Illuminate\Support\Facades\Redis;
 use Illuminate\Support\Str;
+use App\Post;
+use App\Category;
+// use App\Tag;
+use Illuminate\Support\Facades\Auth;
 
 class PostController extends Controller
 {
     protected $validationRules = [
         'title' => 'string|required|max:100',
-        'content' => 'string|required'
+        'content' => 'string|required',
+        'category_id' => 'nullable|exists:categories,id',
+        // 'tags' => 'exists:tags,id'
     ];
+
     /**
      * Display a listing of the resource.
      *
@@ -21,8 +26,11 @@ class PostController extends Controller
      */
     public function index()
     {
-        $posts = Post::all();
-        return view('admin.posts.index', compact('posts'));
+        $user = Auth::user();
+
+        $posts = $user['posts'];
+
+        return view("admin.posts.index", compact("posts"));
     }
 
     /**
@@ -32,7 +40,10 @@ class PostController extends Controller
      */
     public function create()
     {
-        return view("admin.posts.create");
+        $categories = Category::all();
+        // $tags = Tag::all();
+
+        return view("admin.posts.create", compact("categories"));
     }
 
     /**
@@ -43,17 +54,21 @@ class PostController extends Controller
      */
     public function store(Request $request)
     {
-         //validations
-         $request->validate($this->validationRules);
+        //validations
+        $request->validate($this->validationRules);
 
-         $newPost = new Post();
-         $newPost->fill($request->all());
-        
-         $newPost->slug = $this->getSlug($request->title);
- 
-         $newPost->save();
- 
-         return redirect()->route("admin.posts.index")->with('success',"Il post è stato creato");
+        $newPost = new Post();
+        $newPost->fill($request->all());
+       
+        $newPost->slug = $this->getSlug($request->title);
+
+        $newPost->user_id = Auth::id();
+
+        $newPost->save();
+
+        // $newPost->tags()->attach($request["tags"]);
+
+        return redirect()->route("admin.posts.index")->with('success',"Il post è stato creato");
     }
 
     /**
@@ -64,7 +79,11 @@ class PostController extends Controller
      */
     public function show(Post $post)
     {
-        return view('admin.posts.show', compact('post'));
+        if( $post->user_id != Auth::id() ) {
+            abort("403");
+        }
+
+        return view("admin.posts.show", compact("post"));
     }
 
     /**
@@ -75,7 +94,14 @@ class PostController extends Controller
      */
     public function edit(Post $post)
     {
-        return view("admin.posts.edit", compact("post"));
+        if( $post->user_id != Auth::id() ) {
+            abort("403");
+        }
+
+        $categories = Category::all();
+        // $tags = Tag::all();
+
+        return view("admin.posts.edit", compact("post", "categories"));
     }
 
     /**
@@ -87,6 +113,10 @@ class PostController extends Controller
      */
     public function update(Request $request, Post $post)
     {
+        if( $post->user_id != Auth::id() ) {
+            abort("403");
+        }
+        
         //validations
         $request->validate($this->validationRules);
 
@@ -98,6 +128,8 @@ class PostController extends Controller
 
         $post->save();
 
+        // $post->tags()->sync($request->tags);
+
         return redirect()->route("admin.posts.index")->with('success',"Il post {$post->id} è stato aggiornato");
     }
 
@@ -107,13 +139,20 @@ class PostController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function destroy(Post $post)
+    public function destroy(Request $request)
     {
-       $post->delete();
-       return redirect()->route('admin.posts.index')->with('success','il post è stato eliminato');
-    }
+        $post = Post::find($request->id);
 
-     /**
+        if( $post->user_id != Auth::id() ) {
+            abort("403");
+        }
+        
+        $post->delete();
+
+        return redirect()->route("admin.posts.index")->with('success',"Il post {$post->id} è stato eliminato");
+    }
+    
+    /**
      * getSlug - return a unique slug
      *
      * @param  string $title

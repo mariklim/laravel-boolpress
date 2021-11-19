@@ -26,9 +26,9 @@ class PostController extends Controller
      */
     public function index()
     {
-        $user = Auth::user();
+        // $user = Auth::user();
 
-        $posts = $user['posts'];
+        $posts = Post::all();
 
         return view("admin.posts.index", compact("posts"));
     }
@@ -62,7 +62,7 @@ class PostController extends Controller
        
         $newPost->slug = $this->getSlug($request->title);
 
-        $newPost->user_id = Auth::id();
+        // $newPost->user_id = Auth::id();
 
         $newPost->save();
 
@@ -79,9 +79,9 @@ class PostController extends Controller
      */
     public function show(Post $post)
     {
-        if( $post->user_id != Auth::id() ) {
-            abort("403");
-        }
+        // if( $post->user_id != Auth::id() ) {
+        //     abort("403");
+        // }
 
         return view("admin.posts.show", compact("post"));
     }
@@ -94,9 +94,9 @@ class PostController extends Controller
      */
     public function edit(Post $post)
     {
-        if( $post->user_id != Auth::id() ) {
-            abort("403");
-        }
+        // if( $post->user_id != Auth::id() ) {
+        //     abort("403");
+        // }
 
         $categories = Category::all();
         // $tags = Tag::all();
@@ -113,9 +113,9 @@ class PostController extends Controller
      */
     public function update(Request $request, Post $post)
     {
-        if( $post->user_id != Auth::id() ) {
-            abort("403");
-        }
+        // if( $post->user_id != Auth::id() ) {
+        //     abort("403");
+        // }
         
         //validations
         $request->validate($this->validationRules);
@@ -143,9 +143,9 @@ class PostController extends Controller
     {
         $post = Post::find($request->id);
 
-        if( $post->user_id != Auth::id() ) {
-            abort("403");
-        }
+        // if( $post->user_id != Auth::id() ) {
+        //     abort("403");
+        // }
         
         $post->delete();
 

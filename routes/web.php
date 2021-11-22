@@ -1,6 +1,5 @@
 <?php
 
-use App\Http\Controllers\Admin\PostController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -13,23 +12,25 @@ use Illuminate\Support\Facades\Route;
 | contains the "web" middleware group. Now create something great!
 |
 */
-//rotte pubbliche
-Route::get('/', function () {
-    return view('welcome');
-});
 
-Route::get('/', 'PageController@index');
-Route::get('/blog', 'PostController@index');
+// Rotte pubbliche
+Route::get('/', 'PageController@index')->name("homepage");
+Route::get('/chi-sono', 'PageController@about')->name("about");
+Route::get('/contatti', 'PageController@contact')->name("contact");
+Route::get('/blog', 'PostController@index')->name("posts.index");
 Route::get('/blog/{slug}', 'PostController@show')->name("posts.show");
+Route::get('/blog/category/{slug}', 'CategoryController@show')->name("categories.show");
+Route::get('/api-posts', 'PageController@apiPosts')->name("posts.api");
 
-//Rotte autent
+// Rotte Autenticazione
 Auth::routes();
 
+// Rotte area admin
+Route::middleware('auth')->namespace('Admin')->name('admin.')->prefix('admin')->group(function() {
 
-//Rotte Admin
-Route::middleware('auth')->namespace('Admin')->name('admin.')->prefix('admin')->group(function(){
+    Route::get('/', 'HomeController@index')->name('home');
+    Route::resource('posts', 'PostController');
+    Route::resource('categories', 'CategoryController');
+    // Route::resource('tags', 'TagController');
 
-Route::get('/home', 'HomeController@index')->name('home');
-Route::resource('posts', 'PostController');
-Route::resource('categories', 'CategoryController');
 });
